@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { serverURL } from "../Services/serverUrl";
 import {
     MDBCard,
     MDBCardBody,
@@ -16,16 +17,20 @@ import {
   } from 'mdb-react-ui-kit';
   import { FaGithub } from "react-icons/fa";
 import { FaLink } from "react-icons/fa6";
-function ProjectCard() {
+
+function ProjectCard({projects}) {
+  console.log(projects);
+  console.log(`${serverURL}/uploads/${projects.projectImg}`);
+  
     const [optSmModal, setOptSmModal] = useState(false);
 
     const toggleOpen = () => setOptSmModal(!optSmModal);
   return (
     <div> <div className='row'>
     <MDBCard onClick={toggleOpen} style={{ width: '350px', height: '400px' }}>
-      <MDBCardImage src='https://th.bing.com/th/id/OIP.HefJP8AoKvdJQhyonaQ67QHaE8?rs=1&pid=ImgDetMain' position='top' width={'300px'} height={'350px'} alt='...' />
+      <MDBCardImage src={projects?`${serverURL}/uploads/${projects.projectImg}`:'https://th.bing.com/th/id/OIP.HefJP8AoKvdJQhyonaQ67QHaE8?rs=1&pid=ImgDetMain'} position='top' width={'300px'} height={'350px'} alt='...' />
       <MDBCardBody>
-        <MDBCardTitle className='text-center'>Card title</MDBCardTitle>
+        <MDBCardTitle className='text-center'>{projects.title}</MDBCardTitle>
       </MDBCardBody>
     </MDBCard>
   </div>

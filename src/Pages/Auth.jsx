@@ -1,13 +1,18 @@
 import React, { useState } from 'react'
 import AuthImage from '../assets/Auth.jpg'
-import { Link } from 'react-router-dom';
-import { registerAPI } from '../Services/AllApis';
+import { Link, useNavigate } from 'react-router-dom';
+import { loginAPI, registerAPI } from '../Services/AllApis';
 import { Bounce, ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+import Spinner from 'react-bootstrap/Spinner';
 
 function Auth({register}) {
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
   console.log(register);
+
+  const navigate = useNavigate()
 
   const [userData,setUserData] = useState({
     username:"",
@@ -36,7 +41,7 @@ function Auth({register}) {
         const response = await registerAPI(userData)
         console.log(response);
         if(response.status==200){
-          toast.success('Resgister Successful', {
+          toast.success('Register Successful', {
             position: "top-center",
             autoClose: 5000,
             hideProgressBar: false,
@@ -47,6 +52,9 @@ function Auth({register}) {
             theme: "colored",
            
             });
+           setTimeout(()=>{
+            navigate('/login')
+           },6000)
           // setUserData({username:"",email:"",password:""})
         }
         else{
@@ -64,6 +72,63 @@ function Auth({register}) {
             });
         }
       }
+  }
+
+  const handleLogin=async()=>{
+    const {email,password} = userData
+    if(!email|| !password){
+        
+      toast.error('Please fill the details', {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        transition: Bounce,
+        });
+    }else{
+      //api fetching
+      const response = await loginAPI(userData)
+      console.log(response);
+      if(response.status==200){
+        setIsLoggedIn(true)
+        toast.success('Login Successful', {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+         
+          });
+          sessionStorage.setItem("user",JSON.stringify(response.data.user));
+          sessionStorage.setItem("token",response.data.token);
+          setTimeout(()=>{
+            navigate('/');
+           },6000)
+        // setUserData({username:"",email:"",password:""})
+      }
+      else{
+        // alert(response.response.data)
+        toast.warn(response.response.data, {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+         
+          });
+      }
+    }
+    
   }
   
   return (
@@ -92,7 +157,12 @@ function Auth({register}) {
                   </div>
                   :
                     <div>
-                       <button className='btn btn-outline-info mb-3'>Sign In</button>
+                       <button onClick={handleLogin} className='btn btn-info mb-3 '>Sign In 
+                        {
+                          isLoggedIn &&   <Spinner animation="border" variant="light" className='fs-6 mt-1'/>
+
+                        }
+                        </button>
                        <p>New to here? <Link to={'/register'}>Please register Here...</Link> </p>
                     </div>
                 }
